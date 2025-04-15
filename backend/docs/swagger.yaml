@@ -1,0 +1,1386 @@
+basePath: /api/v1
+definitions:
+  dto.AddGenresRequest:
+    properties:
+      geners:
+        example:
+        - '[''Action'''
+        - ' ''Comedy'']'
+        items:
+          type: string
+        type: array
+    type: object
+  dto.CinemaCreate:
+    properties:
+      actors:
+        items:
+          type: string
+        type: array
+      age_rating:
+        type: integer
+      description:
+        type: string
+      duration_minutes:
+        type: integer
+      genres:
+        items:
+          type: string
+        type: array
+      name:
+        type: string
+      original_title:
+        type: string
+      poster_url:
+        type: string
+      rating:
+        type: number
+      user_rating:
+        type: integer
+      year:
+        type: integer
+    required:
+    - name
+    type: object
+  dto.CinemaCreateResponse:
+    properties:
+      id:
+        type: string
+    type: object
+  dto.CinemaUpdate:
+    properties:
+      actors:
+        items:
+          type: string
+        type: array
+      age_rating:
+        type: integer
+      description:
+        type: string
+      duration_minutes:
+        type: integer
+      genres:
+        items:
+          type: string
+        type: array
+      name:
+        type: string
+      original_title:
+        type: string
+      poster_url:
+        type: string
+      rating:
+        type: number
+      year:
+        type: integer
+    type: object
+  dto.CinemaView:
+    properties:
+      actors:
+        items:
+          type: string
+        type: array
+      age_rating:
+        type: integer
+      description:
+        type: string
+      duration_minutes:
+        type: integer
+      genres:
+        items:
+          type: string
+        type: array
+      id:
+        type: string
+      name:
+        type: string
+      poster_url:
+        type: string
+      rating:
+        type: number
+      user_rating:
+        type: integer
+      year:
+        type: integer
+    type: object
+  dto.CouchView:
+    properties:
+      author:
+        type: string
+      id:
+        type: string
+      name:
+        type: string
+      users:
+        items:
+          type: string
+        type: array
+    type: object
+  dto.CreateCouch:
+    properties:
+      name:
+        type: string
+      users:
+        items:
+          type: string
+        type: array
+    type: object
+  dto.HttpErr:
+    properties:
+      description:
+        example: verbose error description
+        type: string
+      err:
+        example: 'Short error message : ''Not Found'' | ''Internal Server Error''
+          | etc'
+        type: string
+    required:
+    - description
+    - err
+    type: object
+  dto.OkResponse:
+    properties:
+      status:
+        example: ok
+        type: string
+    required:
+    - status
+    type: object
+  dto.Rate:
+    properties:
+      rate:
+        type: integer
+    required:
+    - rate
+    type: object
+  dto.UpdateCouch:
+    properties:
+      name:
+        type: string
+      users:
+        items:
+          type: string
+        type: array
+    type: object
+  dto.UserAuth:
+    properties:
+      password:
+        example: qwerty123_AOISROKT(:#*L(*))
+        type: string
+      username:
+        example: msa
+        type: string
+    required:
+    - password
+    - username
+    type: object
+  dto.UserAuthResponse:
+    properties:
+      token:
+        type: string
+    required:
+    - token
+    type: object
+  dto.UserView:
+    properties:
+      id:
+        example: some-uuid-v4
+        type: string
+      password:
+        example: SOME_HASHED_PASSWD
+        type: string
+      username:
+        example: vanya228
+        type: string
+    type: object
+host: https://prod-team-32-n26k57br.REDACTED
+info:
+  contact: {}
+  title: MetaCinema
+  version: "1.0"
+paths:
+  /admin/films:
+    post:
+      consumes:
+      - application/json
+      description: Создает фильм
+      parameters:
+      - description: access token 'Bearer {token}'
+        in: header
+        name: Authorization
+        required: true
+        type: string
+      - description: Request Body
+        in: body
+        name: RequestBody
+        required: true
+        schema:
+          $ref: '#/definitions/dto.CinemaUpdate'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/dto.OkResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/dto.HttpErr'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/dto.HttpErr'
+        "403":
+          description: Forbidden
+          schema:
+            $ref: '#/definitions/dto.HttpErr'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/dto.HttpErr'
+      security:
+      - Bearer: []
+      summary: create film
+      tags:
+      - admin
+  /admin/films/{id}:
+    delete:
+      description: Удаляет фильм
+      parameters:
+      - description: access token 'Bearer {token}'
+        in: header
+        name: Authorization
+        required: true
+        type: string
+      - description: ID of film
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/dto.OkResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/dto.HttpErr'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/dto.HttpErr'
+        "403":
+          description: Forbidden
+          schema:
+            $ref: '#/definitions/dto.HttpErr'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/dto.HttpErr'
+      security:
+      - Bearer: []
+      summary: delete film
+      tags:
+      - admin
+    put:
+      consumes:
+      - application/json
+      description: Обновляет фильм
+      parameters:
+      - description: access token 'Bearer {token}'
+        in: header
+        name: Authorization
+        required: true
+        type: string
+      - description: ID of film
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: Request Body
+        in: body
+        name: RequestBody
+        required: true
+        schema:
+          $ref: '#/definitions/dto.CinemaUpdate'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/dto.CinemaUpdate'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/dto.HttpErr'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/dto.HttpErr'
+        "403":
+          description: Forbidden
+          schema:
+            $ref: '#/definitions/dto.HttpErr'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/dto.HttpErr'
+      security:
+      - Bearer: []
+      summary: update film
+      tags:
+      - admin
+  /couches/:
+    get:
+      description: Получает все диваны
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/dto.CouchView'
+            type: array
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/dto.HttpErr'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/dto.HttpErr'
+        "403":
+          description: Forbidden
+          schema:
+            $ref: '#/definitions/dto.HttpErr'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/dto.HttpErr'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/dto.HttpErr'
+      summary: get couches
+      tags:
+      - couches
+    post:
+      consumes:
+      - application/json
+      description: Создает новый диван
+      parameters:
+      - description: Request Body
+        in: body
+        name: RequestBody
+        required: true
+        schema:
+          $ref: '#/definitions/dto.CreateCouch'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/dto.CouchView'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/dto.HttpErr'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/dto.HttpErr'
+        "403":
+          description: Forbidden
+          schema:
+            $ref: '#/definitions/dto.HttpErr'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/dto.HttpErr'
+      summary: create new couch
+      tags:
+      - couches
+  /couches/{id}:
+    get:
+      description: Получает диван по его ID
+      parameters:
+      - description: Couch ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/dto.CouchView'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/dto.HttpErr'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/dto.HttpErr'
+        "403":
+          description: Forbidden
+          schema:
+            $ref: '#/definitions/dto.HttpErr'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/dto.HttpErr'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/dto.HttpErr'
+      summary: get couch
+      tags:
+      - couches
+    put:
+      consumes:
+      - application/json
+      description: Обновляет диван
+      parameters:
+      - description: Couch ID
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: Request Body
+        in: body
+        name: RequestBody
+        required: true
+        schema:
+          $ref: '#/definitions/dto.UpdateCouch'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/dto.CouchView'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/dto.HttpErr'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/dto.HttpErr'
+        "403":
+          description: Forbidden
+          schema:
+            $ref: '#/definitions/dto.HttpErr'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/dto.HttpErr'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/dto.HttpErr'
+      summary: update couch
+      tags:
+      - couches
+  /couches/{id}/feed:
+    get:
+      description: Показывает рекомендации в диване
+      parameters:
+      - description: Couch ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/dto.CinemaView'
+            type: array
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/dto.HttpErr'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/dto.HttpErr'
+        "403":
+          description: Forbidden
+          schema:
+            $ref: '#/definitions/dto.HttpErr'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/dto.HttpErr'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/dto.HttpErr'
+      summary: get recommended films in couch
+      tags:
+      - couches
+  /couches/{id}/films/{filmId}/dislike:
+    delete:
+      description: Удаляет дизлайк фильма в диване
+      parameters:
+      - description: Couch ID
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: Film ID
+        in: path
+        name: filmId
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "204":
+          description: No Content
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/dto.HttpErr'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/dto.HttpErr'
+        "403":
+          description: Forbidden
+          schema:
+            $ref: '#/definitions/dto.HttpErr'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/dto.HttpErr'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/dto.HttpErr'
+      summary: delete dislike of the film in couch
+      tags:
+      - couches
+    post:
+      description: Дизлайкает фильм в диване
+      parameters:
+      - description: Couch ID
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: Film ID
+        in: path
+        name: filmId
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/dto.HttpErr'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/dto.HttpErr'
+        "403":
+          description: Forbidden
+          schema:
+            $ref: '#/definitions/dto.HttpErr'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/dto.HttpErr'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/dto.HttpErr'
+      summary: dislike film in couch
+      tags:
+      - couches
+  /couches/{id}/films/{filmId}/like:
+    delete:
+      description: Удаляет лайк фильма в диване
+      parameters:
+      - description: Couch ID
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: Film ID
+        in: path
+        name: filmId
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "204":
+          description: No Content
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/dto.HttpErr'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/dto.HttpErr'
+        "403":
+          description: Forbidden
+          schema:
+            $ref: '#/definitions/dto.HttpErr'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/dto.HttpErr'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/dto.HttpErr'
+      summary: delete like of the film in couch
+      tags:
+      - couches
+    post:
+      description: Лайкает фильм в диване
+      parameters:
+      - description: Couch ID
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: Film ID
+        in: path
+        name: filmId
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/dto.HttpErr'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/dto.HttpErr'
+        "403":
+          description: Forbidden
+          schema:
+            $ref: '#/definitions/dto.HttpErr'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/dto.HttpErr'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/dto.HttpErr'
+      summary: like film in couch
+      tags:
+      - couches
+  /couches/{id}/plans:
+    get:
+      description: Получает любимые фильмы дивана
+      parameters:
+      - description: Couch ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/dto.CouchView'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/dto.HttpErr'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/dto.HttpErr'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/dto.HttpErr'
+      summary: get couch likes
+      tags:
+      - couches
+  /couches/{id}/views/bulk:
+    post:
+      parameters:
+      - description: Couch ID
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: Request Body
+        in: body
+        name: RequestBody
+        required: true
+        schema:
+          items:
+            type: string
+          type: array
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/dto.HttpErr'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/dto.HttpErr'
+        "403":
+          description: Forbidden
+          schema:
+            $ref: '#/definitions/dto.HttpErr'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/dto.HttpErr'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/dto.HttpErr'
+      summary: mark film as seen in couch
+      tags:
+      - couches
+  /films/:
+    post:
+      consumes:
+      - application/json
+      description: Добавляет новый фильм в подборку пользователя или добавляет глобальный
+        фильм в базу админом
+      parameters:
+      - description: access token 'Bearer {token}'
+        in: header
+        name: Authorization
+        required: true
+        type: string
+      - description: Request Body
+        in: body
+        name: RequestBody
+        required: true
+        schema:
+          $ref: '#/definitions/dto.CinemaCreate'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/dto.CinemaCreateResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/dto.HttpErr'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/dto.HttpErr'
+      security:
+      - Bearer: []
+      summary: upload new film
+      tags:
+      - films
+  /films/{FilmID}/like:
+    post:
+      parameters:
+      - description: access token 'Bearer {token}'
+        in: header
+        name: Authorization
+        required: true
+        type: string
+      - description: ID of film
+        in: path
+        name: FilmID
+        required: true
+        type: string
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/dto.UserView'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/dto.HttpErr'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/dto.HttpErr'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/dto.HttpErr'
+      security:
+      - Bearer: []
+      summary: like film
+      tags:
+      - users
+  /films/{FilmID}/picture:
+    post:
+      consumes:
+      - multipart/form-data
+      parameters:
+      - description: access token 'Bearer {token}'
+        in: header
+        name: Authorization
+        required: true
+        type: string
+      - description: UUID of the film
+        in: path
+        name: FilmID
+        required: true
+        type: string
+      - description: File of the pic
+        in: formData
+        name: uploadfile
+        required: true
+        type: file
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/dto.HttpErr'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/dto.HttpErr'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/dto.HttpErr'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/dto.HttpErr'
+      security:
+      - Bearer: []
+      summary: Set picture of the cinema
+      tags:
+      - films
+  /films/{filmId}:
+    get:
+      consumes:
+      - application/json
+      description: Получить фильм по id
+      parameters:
+      - description: film uuid
+        in: path
+        name: filmId
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/dto.CinemaView'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/dto.HttpErr'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/dto.HttpErr'
+      summary: get film
+      tags:
+      - films
+  /films/{id}/dislike:
+    delete:
+      parameters:
+      - description: access token 'Bearer {token}'
+        in: header
+        name: Authorization
+        required: true
+        type: string
+      - description: ID of film
+        in: path
+        name: FilmID
+        required: true
+        type: string
+      responses:
+        "204":
+          description: No Content
+          schema:
+            $ref: '#/definitions/dto.UserView'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/dto.HttpErr'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/dto.HttpErr'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/dto.HttpErr'
+      security:
+      - Bearer: []
+      summary: delete dislike of the film
+      tags:
+      - users
+    post:
+      parameters:
+      - description: access token 'Bearer {token}'
+        in: header
+        name: Authorization
+        required: true
+        type: string
+      - description: ID of film
+        in: path
+        name: FilmID
+        required: true
+        type: string
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/dto.UserView'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/dto.HttpErr'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/dto.HttpErr'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/dto.HttpErr'
+      security:
+      - Bearer: []
+      summary: dislike film
+      tags:
+      - users
+  /films/{id}/like:
+    delete:
+      parameters:
+      - description: access token 'Bearer {token}'
+        in: header
+        name: Authorization
+        required: true
+        type: string
+      - description: ID of film
+        in: path
+        name: FilmID
+        required: true
+        type: string
+      responses:
+        "204":
+          description: No Content
+          schema:
+            $ref: '#/definitions/dto.UserView'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/dto.HttpErr'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/dto.HttpErr'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/dto.HttpErr'
+      security:
+      - Bearer: []
+      summary: delete like of the film
+      tags:
+      - users
+  /films/{id}/rate:
+    post:
+      parameters:
+      - description: access token 'Bearer {token}'
+        in: header
+        name: Authorization
+        required: true
+        type: string
+      - description: ID of film
+        in: path
+        name: FilmID
+        required: true
+        type: string
+      - description: Request body
+        in: body
+        name: RequestBody
+        required: true
+        schema:
+          $ref: '#/definitions/dto.Rate'
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/dto.UserView'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/dto.HttpErr'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/dto.HttpErr'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/dto.HttpErr'
+      security:
+      - Bearer: []
+      summary: rate the film
+      tags:
+      - users
+  /films/feed:
+    get:
+      consumes:
+      - application/json
+      description: Список рекомендованных фильмов
+      parameters:
+      - description: limit
+        in: query
+        name: limit
+        required: true
+        type: integer
+      - description: usernames
+        in: query
+        name: username
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/dto.CinemaView'
+            type: array
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/dto.HttpErr'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/dto.HttpErr'
+      summary: get recommended films
+      tags:
+      - films
+  /films/genres:
+    post:
+      consumes:
+      - application/json
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/dto.HttpErr'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/dto.HttpErr'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/dto.HttpErr'
+      summary: Get genres
+      tags:
+      - films
+  /films/popular:
+    get:
+      consumes:
+      - application/json
+      description: Получить список Самых Высоко оценённых фильмов
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/dto.CinemaView'
+            type: array
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/dto.HttpErr'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/dto.HttpErr'
+      summary: get top rated films
+      tags:
+      - films
+  /films/search:
+    post:
+      parameters:
+      - description: Search query
+        in: query
+        name: query
+        required: true
+        type: string
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/dto.OkResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/dto.HttpErr'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/dto.HttpErr'
+      summary: search film
+      tags:
+      - cinemas
+  /films/views/bulk:
+    post:
+      parameters:
+      - description: access token 'Bearer {token}'
+        in: header
+        name: Authorization
+        required: true
+        type: string
+      - description: Request body
+        in: body
+        name: RequestBody
+        required: true
+        schema:
+          items:
+            type: string
+          type: array
+      responses:
+        "201":
+          description: Created
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/dto.HttpErr'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/dto.HttpErr'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/dto.HttpErr'
+      security:
+      - Bearer: []
+      summary: bulk views
+      tags:
+      - users
+  /plans:
+    get:
+      parameters:
+      - description: access token 'Bearer {token}'
+        in: header
+        name: Authorization
+        required: true
+        type: string
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/dto.CinemaView'
+            type: array
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/dto.HttpErr'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/dto.HttpErr'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/dto.HttpErr'
+      security:
+      - Bearer: []
+      summary: get liked films
+      tags:
+      - users
+  /users/genres:
+    post:
+      parameters:
+      - description: access token 'Bearer {token}'
+        in: header
+        name: Authorization
+        required: true
+        type: string
+      - description: Request body
+        in: body
+        name: RequestBody
+        required: true
+        schema:
+          $ref: '#/definitions/dto.AddGenresRequest'
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/dto.OkResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/dto.HttpErr'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/dto.HttpErr'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/dto.HttpErr'
+      security:
+      - Bearer: []
+      summary: add genres
+      tags:
+      - users
+  /users/search:
+    post:
+      parameters:
+      - description: access token 'Bearer {token}'
+        in: header
+        name: Authorization
+        required: true
+        type: string
+      - description: Search query
+        in: query
+        name: query
+        required: true
+        type: string
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/dto.UserView'
+            type: array
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/dto.HttpErr'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/dto.HttpErr'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/dto.HttpErr'
+      security:
+      - Bearer: []
+      summary: search user
+      tags:
+      - users
+  /users/sign-in:
+    post:
+      consumes:
+      - application/json
+      parameters:
+      - description: Logins existed user and returns access token
+        in: body
+        name: RequestBody
+        required: true
+        schema:
+          $ref: '#/definitions/dto.UserAuth'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/dto.UserAuthResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/dto.HttpErr'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/dto.HttpErr'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/dto.HttpErr'
+      summary: login existed user
+      tags:
+      - users
+  /users/sign-up:
+    post:
+      consumes:
+      - application/json
+      parameters:
+      - description: Registers new user and returns access token
+        in: body
+        name: RequestBody
+        required: true
+        schema:
+          $ref: '#/definitions/dto.UserAuth'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/dto.UserAuthResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/dto.HttpErr'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/dto.HttpErr'
+      summary: register new user
+      tags:
+      - users
+securityDefinitions:
+  Bearer:
+    in: header
+    name: Authorization
+    type: apiKey
+swagger: "2.0"

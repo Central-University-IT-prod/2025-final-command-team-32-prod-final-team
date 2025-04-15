@@ -1,0 +1,53 @@
+version: '3'
+
+
+tasks:
+  up:
+    desc: setting up database dependencies (like container for postgres, etc.)
+    cmds:
+      - sudo docker-compose -f dev.yml up -d
+  down:
+    desc: shutting down database dependencies (like container for postgres, etc.)
+    cmds:
+      - sudo docker-compose -f dev.yml down
+
+  build-deps:
+    internal: true
+    desc: building dependencies(some code gen, code formatting, etc.)
+    cmds:
+      - gofmt -w .
+      - task: swag
+      - task: sqlc
+
+  swag:
+    desc: explicitly updates openapi specs
+    cmds:
+      - ./pkg/swag/swag fmt
+      - ./pkg/swag/swag init -g cmd/main.go
+   
+  sqlc:
+    desc: explicitly updates code-gen for sqlc 
+    cmds:
+      - cd pkg/sqlc &&
+        bash generate.sh
+
+  build-server:
+    internal: true
+    desc: compiling server binary
+    cmds:
+      - go build -o bin/server cmd/main.go
+
+  server:
+    desc: running server (database containers must be initialized explicitly)
+
+    cmds:
+      - task: build-deps
+      - task: build-server
+      - ./bin/server
+
+  test:
+    desc: run e2e tests
+    cmds:
+      - go test ./tests/e2e -v -count=1 -run Main
+      
+    

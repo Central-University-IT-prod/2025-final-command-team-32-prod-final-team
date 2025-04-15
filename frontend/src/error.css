@@ -1,0 +1,8 @@
+.error-text {
+    color: #c40a0a;
+}
+
+*:not(.error-text)[error] {
+    border: #c40a0a 2px solid;
+    transition: ease-in-out 150ms;
+}

@@ -1,0 +1,13 @@
+.button {
+    cursor: pointer;
+    transition: ease-in 150ms;
+    user-select: none;
+}
+
+.button:hover {
+    filter: brightness(0.6);
+}
+
+button {
+    cursor: pointer;
+}

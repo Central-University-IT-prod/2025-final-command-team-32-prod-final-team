@@ -1,0 +1,155 @@
+TYPE JWT {
+	id,
+	username
+}
+
+[USERS]
+POST /users/sign-in
+	BODY {
+		string username,
+		string password
+	}
+	RESPONSE 200 {
+		JWT token
+	}
+	
+POST /users/sign-up
+	BODY {
+		string username,
+		string password
+	}
+	RESPONSE 201 {
+		JWT token
+	}
+	
+[CINEMA]
+
+TYPE Cinema {
+
+}GUID id,
+ 	string name,
+ 	string? name_original
+ 	int? year,
+ 	int? age_rating,
+ 	int? duration_minutes,
+ 	string? poster_url,
+ 	string? description,
+ 	string[]? genres,
+ 	string[]? actors,
+ 	float? rating,
+ 	int? user_rate
+
+GET /films/{id}
+	PATH GUID id
+	RESPONSE 200 Cinema
+	
+GET /films/feed
+	QUERY string[] usernames
+	QUERY int limit = 10
+	RESPONSE 200 Cinema[]
+
+GET /films/popular
+	QUERY int limit = 10
+	RESPONSE 200 Cinema[]
+
+GET /films/random
+	RESPONSE 200 Cinema[]
+
+POST /films
+	AUTH
+	BODY {
+		string name,
+		string? poster_url,
+		string[]? genres
+		string? description
+	}
+	RESPONSE 201 {
+		GUID id
+	}
+
+[LIKES]
+
+POST /films/{id}/like
+	AUTH
+	PATH GUID id // Cinema id
+	RETURN 201
+	
+POST /films/{id}/dislike
+	AUTH
+	PATH GUID id // Cinema id
+	RETURN 201
+
+DELETE /films/{id}/like
+	AUTH
+	PATH GUID id // Cinema id
+	RETURN 204
+	
+DELETE /films/{id}/dislike
+	AUTH
+	PATH GUID id // Cinema id
+	RETURN 204
+	
+POST /films/{id}/upd
+	AUTH
+	PATH GUID id // Cinema id
+	BODY {
+		int upd
+	}
+	RETURN 201
+	
+	
+[PLANS]
+
+GET /plans
+	AUTH
+	QUERY int limit = 30
+	RESPONSE 200 Cinema[]
+	
+POST /plans
+	AUTH
+	BODY {
+		GUID cinema_id
+	}
+	RESPONSE 201
+	
+DELETE /plans/{id}
+	AUTH
+	PATH GUID id // Cinema id
+	RESPONSE 204
+	
+	
+//OPTIONAL
+[COUCH]
+
+TYPE Couch {
+	GUID id,
+	string name,
+	string[] users,
+	string author
+}
+
+POST /couch
+	AUTH
+	BODY {
+		string name,
+		string[] users
+	}
+	RESPONSE 201 Couch
+	
+PUT /couch/{id}
+	PATH GUID id // Couch id
+	AUTH
+	BODY {
+		string? name,
+		string[]? users
+	}
+	RESPONSE 200 Couch
+	
+GET /couch/{id}
+	PATH GUID id // Couch id
+	AUTH
+	RESPONSE 200 Couch
+	
+GET /couch
+	AUTH
+	RESPONSE 200 Couch[]

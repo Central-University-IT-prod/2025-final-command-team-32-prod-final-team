@@ -1,0 +1,51 @@
+.ssh:
+  image: kroniak/ssh-client:3.19
+  variables:
+    SSH_HOST: "prod-team-32-n26k57br.REDACTED"
+    SSH_USER: "ubuntu"
+    SSH_ADDRESS: $SSH_USER@$SSH_HOST
+  before_script:
+    - mkdir -p ~/.ssh && chmod 700 ~/.ssh
+    - echo -e "Host *\n\tStrictHostKeyChecking no\n\n" > ~/.ssh/config && chmod 600 ~/.ssh/config
+    - export SSH_PRIVATE_KEY_BASE64=$(cat ./backend/.ssh/private_key.pem)
+    - echo "$SSH_PRIVATE_KEY_BASE64" > ~/.ssh/id_rsa && chmod 400 ~/.ssh/id_rsa
+    - ssh-agent sh -c "ssh-add ~/.ssh/id_rsa"
+    - ssh-keyscan -H "$SSH_HOST"
+
+
+.docker_run:
+  extends: .ssh
+  stage: deploy
+  variables:
+    OPT_DOCKER: ""
+    DOCKERFILE_PATH: Dockerfile
+    IMAGE_TAG: $CI_COMMIT_SHA
+    IMAGE_NAME_BACKEND: "${CI_REGISTRY_IMAGE}:backend"
+    IMAGE_NAME_FRONTEND: "${CI_REGISTRY_IMAGE}:frontend"
+    CI_COMMIT_SHA: "${CI_COMMIT_SHA}"
+    CI_REGISTRY_IMAGE: "${CI_REGISTRY_IMAGE}"
+    DOCKER_HOST: tcp://docker:2376
+    DOCKER_TLS_CERTDIR: "/certs"
+    DOCKER_TLS_VERIFY: 1
+    DOCKER_CERT_PATH: "$DOCKER_TLS_CERTDIR/client"
+    DOCKER_DRIVER: overlay2
+    PRUNE_COMMAND: "docker system prune -f -a"
+    CONTAINER_NAME_SUFFIX: ""
+  script:
+    - AUTH_COMMAND="echo "$CI_REGISTRY_PASSWORD" | docker login $CI_REGISTRY --username $CI_REGISTRY_USER --password-stdin";
+    - ssh $SSH_ADDRESS "$AUTH_COMMAND"
+    - scp -r . $SSH_ADDRESS:/home/ubuntu/project
+    - ssh $SSH_ADDRESS "docker pull $IMAGE_NAME_BACKEND"  # pull backend image
+    - ssh $SSH_ADDRESS "docker pull $IMAGE_NAME_FRONTEND"  # pull frontend image
+    - ssh $SSH_ADDRESS "cd project; sudo docker compose down || true"
+    - ssh $SSH_ADDRESS " cd project; CI_COMMIT_SHA=$CI_COMMIT_SHA CI_REGISTRY_IMAGE=$CI_REGISTRY_IMAGE sudo docker compose up -d "
+    - ssh $SSH_ADDRESS "$PRUNE_COMMAND"  # pull minio image
+
+
+#    - ls
+#    - ssh $SSH_ADDRESS "
+#      docker run -d
+#      --log-driver local
+#      --log-opt max-size=100m
+#      --name=$CI_PROJECT_NAME $OPT_DOCKER
+#      $IMAGE_NAME"

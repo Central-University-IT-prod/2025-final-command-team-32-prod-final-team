@@ -1,0 +1,36 @@
+version: "2"
+sql:
+  - engine: "postgresql"
+    queries: "../../internal/database/queries/"
+    schema: "../../internal/database/migrations/"
+    gen:
+      go:
+        emit_methods_with_db_argument: true
+        package: "storage"
+        out: "../../internal/database/storage"
+        sql_package: "pgx/v5"
+        overrides:   
+          - db_type: "text"
+            go_type: 
+              type: "string"
+              pointer: true
+            nullable: true
+
+          - db_type: "pg_catalog.int4"
+            go_type: 
+              type: "int32"
+              pointer: true
+            nullable: true
+
+          - db_type: "pg_catalog.float8"
+            go_type: 
+              type: "float64"
+              pointer: true
+            nullable: true
+
+          - db_type: "uuid"
+            go_type:
+              import: "github.com/google/uuid"
+              type: "UUID"
+        
+ 

@@ -1,0 +1,32 @@
+---
+.build:
+  image: 
+    name: gcr.io/kaniko-project/executor:v1.23.2-debug
+    entrypoint: [""]
+  stage: build
+  variables:
+    DOCKERFILE_PATH_BACKEND: ./backend/Dockerfile
+    DOCKERFILE_PATH_FRONTEND: ./frontend/Dockerfile
+    DOCKER_CONFIG: /kaniko/.docker
+    CONTEXT: $CI_PROJECT_DIR
+    IMAGE_TAG: $CI_COMMIT_SHA
+    IMAGE_NAME: $CI_REGISTRY_IMAGE
+    REGISTRY_USER: $CI_REGISTRY_USER
+    REGISTRY_PASSWORD: $CI_REGISTRY_PASSWORD
+    REGISTRY_URL: $CI_REGISTRY
+  script:
+    - mkdir -p /kaniko/.docker
+    - echo "{\"auths\":{\"$CI_REGISTRY\":{\"username\":\"$REGISTRY_USER\",\"password\":\"$REGISTRY_PASSWORD\"}}}" > /kaniko/.docker/config.json
+    - ls
+    - /kaniko/executor
+      --context "${CONTEXT}/backend"
+      --dockerfile "${CI_PROJECT_DIR}/${DOCKERFILE_PATH_BACKEND}"
+      --destination "${IMAGE_NAME}:backend"
+      --cache=True
+      --registry-mirror=dockerhub.timeweb.cloud
+    - /kaniko/executor
+      --context "${CONTEXT}/frontend"
+      --dockerfile "${CI_PROJECT_DIR}/${DOCKERFILE_PATH_FRONTEND}"
+      --destination "${IMAGE_NAME}:frontend"
+      --cache=True
+      --registry-mirror=dockerhub.timeweb.cloud

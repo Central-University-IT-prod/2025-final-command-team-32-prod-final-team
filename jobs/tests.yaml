@@ -1,0 +1,16 @@
+---
+.test:
+  image:
+    name: golang:1.23.6
+  stage: test
+  script:
+    - go version
+    - cd backend; go test -v ./tests/...
+
+#.e2e:
+#  image:
+#    name: golang:1.23.6
+#  stage: test_e2e
+#  script:
+#    - go version
+#    - cd backend; go test -v ./internal/api/handlers/v1/...

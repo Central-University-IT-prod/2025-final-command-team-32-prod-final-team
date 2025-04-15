@@ -1,0 +1,121 @@
+version: '3'
+
+services:
+  backend:
+    container_name: backend
+    environment:
+      CI_REGISTRY_IMAGE: $CI_REGISTRY_IMAGE
+      CI_COMMIT_SHA: $CI_COMMIT_SHA
+    image: REDACTED:5050/team-32/prod-final-team:backend
+    env_file:
+      - ./backend/.env
+    restart: unless-stopped
+    networks:
+      - prod-network
+      - backend-network
+
+    depends_on:
+      postgres:
+        condition: service_healthy
+
+  postgres:
+    container_name: postgres
+    image: pgvector/pgvector:pg17
+    env_file:
+      - ./backend/.env
+    volumes:
+      - pg_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "sh -c 'pg_isready -U postgres -d db'"]
+      interval: 5s
+      timeout: 5s
+      retries: 3
+      start_period: 5s
+    restart: unless-stopped
+
+    networks:
+      - backend-network
+
+  minio:
+    container_name: minio
+    image: quay.io/minio/minio
+    restart: unless-stopped
+    environment:
+      - MINIO_ROOT_USER=admin
+      - MINIO_ROOT_PASSWORD=admin123
+    command: server /data --console-address ":9001"
+    volumes:
+      - minio_data:/data
+    networks:
+      - prod-network
+      - backend-network
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:9000/minio/health/live"]
+      interval: 5s
+      timeout: 5s
+      retries: 3
+  
+  prometheus:
+    container_name: prometheus
+    image: prom/prometheus
+    volumes:
+      - ./backend/prometheus.yml:/etc/prometheus/prometheus.yml
+    networks:
+      - backend-network
+    restart: unless-stopped
+
+  grafana:
+    container_name: grafana
+    image: grafana/grafana
+    env_file:
+      - ./backend/.env
+    volumes:
+      -  grafana_data:/var/lib/grafana
+      - ./backend/.grafana/provisioning/local.yaml:/etc/grafana/provisioning/dashboards/main.yaml
+      - ./backend/.grafana/dashboards:/var/lib/grafana/dashboards
+      - ./backend/.grafana/datasources:/etc/grafana/provisioning/datasources
+    networks:
+      - backend-network
+      - prod-network
+    restart: unless-stopped
+
+  frontend:
+    container_name: frontend
+    environment:
+      CI_REGISTRY_IMAGE : $CI_REGISTRY_IMAGE
+      CI_COMMIT_SHA : $CI_COMMIT_SHA
+    image: REDACTED:5050/team-32/prod-final-team:frontend
+    restart: unless-stopped
+    networks:
+      - prod-network
+    depends_on:
+      - backend
+  
+  nginx:
+    container_name: nginx
+    image: nginx:alpine
+    volumes:
+      - ./nginx.conf:/etc/nginx/nginx.conf:ro
+      - ./backend/.ssl:/etc/nginx/certs:ro
+    ports:
+      - 80:80
+      - 443:443
+    restart: unless-stopped
+    networks:
+      - prod-network
+    
+    depends_on:
+      - frontend
+      - backend
+    
+    
+networks:
+  prod-network:
+    driver: bridge
+  backend-network:
+    driver: bridge
+
+volumes:
+  pg_data:
+  minio_data:
+  grafana_data:

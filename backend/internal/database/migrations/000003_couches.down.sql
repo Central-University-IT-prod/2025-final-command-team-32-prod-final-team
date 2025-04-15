@@ -1,0 +1,4 @@
+BEGIN;
+DROP TABLE IF EXISTS couches;
+DROP TABLE IF EXISTS couch_sitters;
+COMMIT;

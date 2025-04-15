@@ -1,0 +1,44 @@
+[USERS]
+POST /users/sign-in (done) 
+POST /users/sign-up (done)
+
+
+[CINEMA]
+
+GET /films/{id}	(Leha)
+
+GET /films/feed (msa)
+
+
+
+POST /films (Leha)
+
+[LIKES]
+
+POST /films/{id}/like (Mishanya)
+	
+POST /films/{id}/dislike (Mishanya)
+
+DELETE /films/{id}/like (Mishanya)
+	
+DELETE /films/{id}/dislike (Mishanya)
+	
+POST /films/{id}/upd (Mishanya)
+	
+	
+[PLANS]
+
+GET /plans (msa)
+
+
+[COUCH]
+
+
+POST /couch
+	
+PUT /couch/{id}
+	
+GET /couch/{id}
+	
+GET /couch
+
